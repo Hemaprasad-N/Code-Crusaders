@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <title>🎙️ Tamil Voice to English Translation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      background-color: #f9f9f9;
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .start-btn {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .stop-btn {
+      background-color: #c0392b;
+      color: white;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    #micIndicator {
+      font-size: 28px;
+      margin: 20px auto;
+      color: #e74c3c;
+      display: none;
+      animation: pulse 1.1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .output-box {
+      background: #fff;
+      padding: 25px;
+      max-width: 700px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      text-align: left;
+      margin-top: 30px;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-top: 15px;
+      color: #34495e;
+    }
+
+    .result {
+      margin: 5px 0 20px 0;
+      font-size: 18px;
+      color: #2c3e50;
+    }
+
+    .copy-btn {
+      font-size: 13px;
+      background-color: #ddd;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .copy-btn:hover {
+      background-color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <h1>🗣 Tamil Voice to English Translator</h1>
+
+  <button class="btn start-btn" id="startBtn">🎙️ Start Listening</button>
+  <button class="btn stop-btn" id="stopBtn">⏹️ Stop</button>
+  <div id="micIndicator">🎤 Listening...</div>
+
+  <div class="output-box">
+    <div class="label">Tamil Transcription:
+      <button class="copy-btn" onclick="copyText('tamilText')">Copy</button>
+    </div>
+    <div id="tamilText" class="result">...</div>
+
+    <div class="label">English Translation:
+      <button class="copy-btn" onclick="copyText('englishText')">Copy</button>
+    </div>
+    <div id="englishText" class="result">...</div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const tamilTextDiv = document.getElementById("tamilText");
+    const englishTextDiv = document.getElementById("englishText");
+    const micIndicator = document.getElementById("micIndicator");
+
+    let recognition;
+    let isListening = false;
+
+    if (!('webkitSpeechRecognition' in window)) {
+      alert("Your browser doesn't support Tamil speech recognition. Use Google Chrome.");
+    } else {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'ta-IN';
+
+      recognition.onresult = function(event) {
+        const transcript = event.results[event.results.length - 1][0].transcript.trim();
+        tamilTextDiv.textContent = transcript;
+        translateToEnglish(transcript);
+      };
+
+      recognition.onerror = function(event) {
+        console.error("Speech error:", event.error);
+        micIndicator.style.display = "none";
+        isListening = false;
+      };
+
+      recognition.onend = () => {
+        micIndicator.style.display = "none";
+        isListening = false;
+      };
+    }
+
+    function translateToEnglish(tamil) {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ta&tl=en&dt=t&q=${encodeURIComponent(tamil)}`;
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const translated = data[0][0][0];
+          englishTextDiv.textContent = translated;
+        })
+        .catch(() => {
+          englishTextDiv.textContent = "❌ Translation failed.";
+        });
+    }
+
+    startBtn.onclick = () => {
+      if (!isListening) {
+        recognition.start();
+        micIndicator.style.display = "block";
+        isListening = true;
+      }
+    };
+
+    stopBtn.onclick = () => {
+      if (isListening) {
+        recognition.stop();
+        micIndicator.style.display = "none";
+        isListening = false;
+      }
+    };
+
+    function copyText(id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+  </script>
+</body>
+</html>
+
