@@ -1,0 +1,27 @@
+translate_handler.py using argos-translate
+```
+from huggingface_hub import snapshot_download
+import os
+
+# Define the model name and the local directory where you want to save it
+# Changed to a more robust and widely supported model for multi-language translation
+model_name = "facebook/nllb-200-distilled-600M"
+# Create a specific folder for this model
+local_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "nllb-200-distilled-600M")
+
+print(f"Attempting to download model '{model_name}' to '{local_dir}'...")
+
+try:
+    # This will download all files for the model to the specified local_dir
+    # If the directory already exists and contains the files, it will skip downloading.
+    snapshot_download(repo_id=model_name, local_dir=local_dir)
+    print(f"Model '{model_name}' downloaded successfully to '{local_dir}'.")
+except Exception as e:
+    print(f"Error downloading model: {e}")
+    print("Please ensure you have an internet connection and no firewall/proxy is blocking access to huggingface.co.")
+    print("If the issue persists, you might need to manually download the files from the Hugging Face website")
+    print("and place them into the directory:")
+    print(f"  {local_dir}")
+
+
+```
