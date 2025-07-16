@@ -1,0 +1,8 @@
+whisper
+transformers
+sentencepiece
+torch
+fastapi
+uvicorn
+sqlite3
+requests
