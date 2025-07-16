@@ -9,3 +9,4 @@ def get_connection():
         password="Magesh#2004",
         database="cat_db" 
     )
+import mysql.connector

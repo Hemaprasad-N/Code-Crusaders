@@ -2,7 +2,7 @@
 <html lang="ta">
 <head>
   <meta charset="UTF-8">
-  <title>🎙️ Tamil Voice to English Translation</title>
+  <title>🎙️ Tamil Voice to AI Catalog</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -11,91 +11,41 @@
       color: #333;
       text-align: center;
     }
-
-    h1 {
-      font-size: 26px;
-      margin-bottom: 30px;
-      color: #2c3e50;
-    }
-
+    h1 { font-size: 26px; margin-bottom: 30px; color: #2c3e50; }
     .btn {
-      padding: 12px 20px;
-      margin: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 12px 20px; margin: 10px; font-size: 16px;
+      border: none; border-radius: 6px; cursor: pointer;
       transition: background 0.3s ease;
     }
-
-    .start-btn {
-      background-color: #27ae60;
-      color: white;
-    }
-
-    .stop-btn {
-      background-color: #c0392b;
-      color: white;
-    }
-
-    .btn:hover {
-      opacity: 0.9;
-    }
-
+    .start-btn { background-color: #27ae60; color: white; }
+    .stop-btn { background-color: #c0392b; color: white; }
+    .submit-btn { background-color: #2980b9; color: white; }
+    .btn:hover { opacity: 0.9; }
     #micIndicator {
-      font-size: 28px;
-      margin: 20px auto;
-      color: #e74c3c;
-      display: none;
-      animation: pulse 1.1s infinite;
+      font-size: 28px; margin: 20px auto; color: #e74c3c;
+      display: none; animation: pulse 1.1s infinite;
     }
-
     @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
+      0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
     }
-
     .output-box {
-      background: #fff;
-      padding: 25px;
-      max-width: 700px;
-      margin: 0 auto;
-      border-radius: 10px;
+      background: #fff; padding: 25px; max-width: 700px;
+      margin: 0 auto; border-radius: 10px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-      text-align: left;
-      margin-top: 30px;
+      text-align: left; margin-top: 30px;
     }
-
-    .label {
-      font-weight: bold;
-      margin-top: 15px;
-      color: #34495e;
-    }
-
-    .result {
-      margin: 5px 0 20px 0;
-      font-size: 18px;
-      color: #2c3e50;
-    }
-
+    .label { font-weight: bold; margin-top: 15px; color: #34495e; }
+    .result { margin: 5px 0 20px 0; font-size: 18px; color: #2c3e50; }
     .copy-btn {
-      font-size: 13px;
-      background-color: #ddd;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-left: 10px;
+      font-size: 13px; background-color: #ddd;
+      border: none; padding: 4px 8px; border-radius: 4px;
+      cursor: pointer; margin-left: 10px;
     }
-
-    .copy-btn:hover {
-      background-color: #bbb;
-    }
+    .copy-btn:hover { background-color: #bbb; }
   </style>
 </head>
 <body>
-  <h1>🗣 Tamil Voice to English Translator</h1>
+  <h1>🗣 Tamil Voice to AI Catalog</h1>
 
   <button class="btn start-btn" id="startBtn">🎙️ Start Listening</button>
   <button class="btn stop-btn" id="stopBtn">⏹️ Stop</button>
@@ -111,6 +61,10 @@
       <button class="copy-btn" onclick="copyText('englishText')">Copy</button>
     </div>
     <div id="englishText" class="result">...</div>
+  </div>
+
+  <div>
+    <button class="btn submit-btn" onclick="sendToAPI()">📤 Submit to AI Catalog</button>
   </div>
 
   <script>
@@ -184,7 +138,25 @@
         alert("Copied to clipboard!");
       });
     }
+
+    async function sendToAPI() {
+      const tamil = tamilTextDiv.textContent;
+      const english = englishTextDiv.textContent;
+
+      if (!tamil || tamil === "..." || !english || english === "...") {
+        alert("Please record and translate first.");
+        return;
+      }
+
+      const res = await fetch("http://localhost:8000/save-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tamil_text: tamil, english_translation: english })
+      });
+
+      const result = await res.json();
+      alert("✅ Saved to Catalog!\n\n🧠 AI Description:\n" + result.generated_text);
+    }
   </script>
 </body>
 </html>
-
